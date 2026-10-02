@@ -1,0 +1,510 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lead Finder</title>
+  <style>
+    :root{
+      --bg:#edf3fb;
+      --bg2:#f8fbff;
+      --ink:#14213d;
+      --muted:#5d6d87;
+      --card:#ffffff;
+      --line:#dfe8f3;
+      --blue:#2f5bff;
+      --blue-dark:#2447d8;
+      --mint:#19b38a;
+      --mint-dark:#0ea171;
+      --warning:#f5b94a;
+      --danger:#d85757;
+      --shadow:0 18px 42px rgba(20,33,61,.08);
+      --shadow-soft:0 10px 28px rgba(20,33,61,.05);
+      --glow:rgba(47,91,255,.12);
+    }
+
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0d1524;
+        --bg2:#0f1b2d;
+        --ink:#edf4ff;
+        --muted:#9fafc8;
+        --card:#162437;
+        --line:#2a3a52;
+        --shadow:0 22px 46px rgba(0,0,0,.22);
+        --shadow-soft:0 12px 28px rgba(0,0,0,.16);
+        --glow:rgba(47,91,255,.18);
+      }
+    }
+
+    *{box-sizing:border-box;margin:0}
+    html{scroll-behavior:smooth}
+    body{
+      background:
+        radial-gradient(circle at top left, rgba(47,91,255,.08), transparent 26%),
+        radial-gradient(circle at top right, rgba(25,179,138,.10), transparent 24%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      color:var(--ink);
+      font:400 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      padding:28px 18px 80px;
+    }
+
+    main{
+      max-width:860px;
+      margin:0 auto;
+    }
+
+    .hero{
+      display:flex;align-items:flex-end;justify-content:space-between;gap:18px;
+      margin-bottom:18px;
+    }
+
+    h1{
+      font-size:34px;line-height:1.06;letter-spacing:-.04em;margin:0;font-weight:800;
+      background:linear-gradient(135deg, var(--blue), var(--mint));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+      background:rgba(25,179,138,.10);color:#0d7d5d;border:1px solid rgba(25,179,138,.15);
+      font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+      box-shadow:0 10px 24px rgba(25,179,138,.08);
+    }
+
+    .badge::before{
+      content:"";width:8px;height:8px;border-radius:50%;background:var(--mint);
+      box-shadow:0 0 14px rgba(25,179,138,.75);
+    }
+
+    .sub{
+      color:var(--muted);margin-bottom:24px;font-size:15px;line-height:1.7;
+    }
+
+    form{
+      display:grid;gap:14px;background:var(--card);border:1px solid var(--line);
+      border-radius:22px;padding:26px;box-shadow:var(--shadow);
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+
+    form:focus-within{
+      border-color:rgba(47,91,255,.42);
+      box-shadow:0 18px 40px var(--glow);
+      transform:translateY(-2px);
+    }
+
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+    label{
+      display:grid;gap:7px;font-size:14px;font-weight:700;color:var(--muted);
+    }
+
+    input[type=text], input[type=password]{
+      width:100%;font:inherit;color:var(--ink);background:rgba(238,242,247,.9);
+      border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px;
+      transition:all .22s ease;
+    }
+
+    input:hover{border-color:#c6d3e6}
+    input:focus-visible{
+      outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,91,255,.12);background:#fff;
+    }
+
+    .chk{
+      display:flex;align-items:center;gap:10px;color:var(--ink);font-size:14px;padding:10px 6px;border-radius:10px;transition:background .2s ease;cursor:pointer;
+    }
+    .chk:hover{background:rgba(47,91,255,.04)}
+    .chk input{
+      width:18px;height:18px;accent-color:var(--blue);cursor:pointer;
+    }
+
+    .site-wrap{position:relative;display:grid;gap:8px}
+    .url-preview{
+      display:flex;align-items:center;gap:8px;min-height:0;max-height:0;opacity:0;overflow:hidden;
+      transform:translateY(-8px);transition:all .3s ease;padding:0 8px;color:var(--blue);font-size:13px;font-weight:700;
+    }
+    .url-preview.visible{
+      max-height:32px;opacity:1;transform:translateY(0);padding-top:2px;
+    }
+    .site-pill{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;
+      background:rgba(47,91,255,.08);border:1px solid rgba(47,91,255,.12);animation:slideIn .3s ease;
+    }
+    .site-dot{
+      width:10px;height:10px;border-radius:50%;
+      background:linear-gradient(135deg, var(--mint), var(--blue));
+      box-shadow:0 0 12px rgba(25,179,138,.6);
+      animation:pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1);opacity:1}
+      50%{transform:scale(1.25);opacity:.8}
+    }
+    @keyframes slideIn{
+      from{opacity:0;transform:translateY(-10px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    #go{
+      font:inherit;font-weight:800;background:linear-gradient(135deg, var(--blue), var(--blue-dark));color:#fff;border:0;border-radius:12px;padding:15px 18px;cursor:pointer;transition:all .25s ease;box-shadow:0 12px 24px rgba(47,91,255,.25);width:100%;position:relative;overflow:hidden;
+    }
+    #go:before{
+      content:"";position:absolute;inset:-30%;
+      background:linear-gradient(120deg, transparent 20%, rgba(255,255,255,.32), transparent 80%);
+      transform:translateX(-120%) rotate(12deg);transition:transform .7s ease;
+    }
+    #go:hover:not(:disabled):before{transform:translateX(120%) rotate(12deg)}
+    #go:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 16px 30px rgba(47,91,255,.32)}
+    #go:active:not(:disabled){transform:translateY(0)}
+    #go:disabled{opacity:.75;cursor:wait}
+
+    #msg{
+      margin:20px 0 12px;padding:12px 14px;border-radius:12px;color:var(--blue);
+      background:rgba(47,91,255,.08);border:1px solid rgba(47,91,255,.12);
+      font-weight:700;font-size:15px;transition:all .25s ease;opacity:0;transform:translateY(-8px);
+    }
+    #msg.show{opacity:1;transform:translateY(0)}
+    #msg.err{
+      color:var(--danger);background:rgba(217,87,87,.08);border-color:rgba(217,87,87,.15);
+    }
+    #msg.success{
+      color:#0f7c5e;background:rgba(25,179,138,.08);border-color:rgba(25,179,138,.15);
+    }
+    .loader{
+      display:inline-block;width:15px;height:15px;border:2px solid rgba(47,91,255,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:8px;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .summary{
+      display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:12px;margin:8px 0 18px;
+    }
+    .stat{
+      background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow-soft);
+    }
+    .stat .label{
+      font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+    }
+    .stat .value{
+      font-size:24px;font-weight:800;letter-spacing:-.03em;
+    }
+
+    .list{display:grid;gap:16px;margin-top:4px}
+    .item{
+      background:var(--card);border:1px solid var(--line);border-radius:18px;
+      box-shadow:var(--shadow-soft);padding:18px 18px 16px;
+      opacity:0;transform:translateY(16px);animation:itemIn .45s ease forwards;
+    }
+    @keyframes itemIn{to{opacity:1;transform:translateY(0)}}
+    .item h3{
+      font-size:19px;font-weight:800;margin-bottom:4px;letter-spacing:-.02em;
+    }
+    .item p{color:var(--muted);font-size:15px;line-height:1.55}
+    .tag{
+      display:inline-block;background:linear-gradient(135deg, var(--mint), var(--mint-dark));color:#fff;
+      border-radius:999px;padding:5px 10px;font-size:12px;font-weight:800;letter-spacing:.02em;margin:10px 0 6px;
+    }
+    .tag.social{background:linear-gradient(135deg, #f7b733, var(--warning))}
+    .rating{
+      display:flex;align-items:center;gap:6px;margin-top:8px;color:var(--muted);font-size:14px;
+    }
+    .star{color:#f5b94a;font-size:16px;line-height:1}
+    .acts{
+      display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;
+    }
+    .acts a,.acts .cp{
+      display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;border-radius:10px;
+      color:var(--blue);text-decoration:none;font-size:14px;font-weight:700;background:rgba(47,91,255,.08);
+      border:1px solid rgba(47,91,255,.08);transition:all .2s ease;
+    }
+    .acts a:hover,.acts .cp:hover{
+      background:rgba(47,91,255,.12);transform:translateY(-1px);
+    }
+    .acts .cp{
+      cursor:pointer;border:none;font-family:inherit;color:var(--blue);
+    }
+
+    .hint{
+      margin-top:28px;color:var(--muted);font-size:14px;line-height:1.7;padding:14px 16px;
+      border-left:3px solid var(--blue);background:rgba(47,91,255,.04);border-radius:10px;
+    }
+
+    @media (max-width:620px){
+      .hero{display:block}
+      .badge{margin-top:12px;display:inline-flex}
+      .two{grid-template-columns:1fr}
+      .summary{grid-template-columns:1fr}
+      h1{font-size:27px}
+      body{padding:20px 14px 60px}
+      form{padding:18px}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="hero">
+      <h1>Find businesses without a website</h1>
+      <div class="badge">Local leads</div>
+    </div>
+
+    <p class="sub">Enter a business type and a city. The list shows local businesses that have no website on their Google listing.</p>
+
+    <form id="f">
+      <label>Google Places API key
+        <input id="key" type="password" autocomplete="off" placeholder="Paste your key (saved only in this browser)" required>
+      </label>
+
+      <div class="two">
+        <label>Business type
+          <input id="type" type="text" placeholder="e.g. barbers, restaurants, plumbers" required>
+        </label>
+        <label>City
+          <input id="city" type="text" placeholder="e.g. Haifa, Tel Aviv, חיפה" required>
+        </label>
+      </div>
+
+      <div class="site-wrap">
+        <label>Your website URL
+          <input id="myurl" type="text" inputmode="url" placeholder="https://yourwebsite.com">
+        </label>
+        <div id="urlPreview" class="url-preview" aria-live="polite">
+          <div class="site-pill">
+            <span class="site-dot"></span>
+            <span id="urlText">Website ready</span>
+          </div>
+        </div>
+      </div>
+
+      <label class="chk">
+        <input id="social" type="checkbox" checked>
+        Also show businesses that only have a Facebook or Instagram page
+      </label>
+
+      <button id="go" type="submit">Find businesses</button>
+    </form>
+
+    <div class="summary" aria-live="polite">
+      <div class="stat">
+        <div class="label">Potential leads</div>
+        <div id="leadCount" class="value">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Checked</div>
+        <div id="checkedCount" class="value">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">Status</div>
+        <div id="statusCount" class="value">Ready</div>
+      </div>
+    </div>
+
+    <p id="msg" role="status" aria-live="polite"></p>
+    <div id="out" class="list"></div>
+
+    <p class="hint">Results come from Google listings, which are not always complete. Before you contact a business, search for its name to confirm it really has no website.</p>
+  </main>
+
+  <script>
+    var $ = function(id){ return document.getElementById(id); };
+    var SOCIAL = /(facebook\.com|fb\.com|instagram\.com|linktr\.ee|tiktok\.com|wa\.me|linkedin\.com|twitter\.com|x\.com|business\.site)/i;
+
+    try {
+      $('key').value = localStorage.getItem('placesKey') || '';
+      $('myurl').value = localStorage.getItem('myUrl') || '';
+      updateWebsitePreview($('myurl').value);
+    } catch (e) {}
+
+    function el(tag, cls, text){
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text) n.textContent = text;
+      return n;
+    }
+
+    function link(text, href){
+      var a = el('a', '', text);
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      return a;
+    }
+
+    function pitch(name, url){
+      return 'Hi, I found ' + name + ' on Google and noticed you don\'t have a website yet. '
+        + 'I build modern, fast websites for local businesses, and you can see my work here: '
+        + (url || 'https://example.com') + '. '
+        + 'Would you like to chat about it?';
+    }
+
+    function copyText(t, btn){
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(function(){ btn.textContent = old; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done, function(){ prompt('Copy this message:', t); });
+      } else {
+        prompt('Copy this message:', t);
+      }
+    }
+
+    function setMsg(t, err, success){
+      var m = $('msg');
+      m.textContent = t;
+      m.className = 'show';
+      if (err) m.classList.add('err');
+      else if (success) m.classList.add('success');
+      else m.classList.remove('err', 'success');
+    }
+
+    function updateWebsitePreview(value){
+      var preview = $('urlPreview');
+      var out = $('urlText');
+      var safe = value.trim();
+
+      if (!safe){
+        preview.classList.remove('visible');
+        return;
+      }
+
+      preview.classList.add('visible');
+      var clean = safe.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+      out.textContent = clean.length > 28 ? clean.slice(0, 28) + '…' : clean;
+    }
+
+    $('myurl').addEventListener('input', function(){
+      updateWebsitePreview(this.value);
+    });
+
+    async function fetchAll(key, query){
+      var hasHebrew = /[\u0590-\u05FF]/.test(query);
+      var all = [], token = null;
+
+      for (var page = 0; page < 3; page++){
+        var body = { textQuery: query, pageSize: 20, regionCode: 'IL', languageCode: hasHebrew ? 'he' : 'en' };
+        if (token) body.pageToken = token;
+
+        var res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': key,
+            'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.googleMapsUri,places.rating,places.userRatingCount,nextPageToken'
+          },
+          body: JSON.stringify(body)
+        });
+
+        var data = await res.json();
+        if (!res.ok) throw new Error((data.error && data.error.message) || 'Request failed');
+
+        all = all.concat(data.places || []);
+        token = data.nextPageToken;
+        if (!token) break;
+      }
+
+      return all;
+    }
+
+    $('f').addEventListener('submit', async function(e){
+      e.preventDefault();
+
+      var key = $('key').value.trim();
+      var query = $('type').value.trim() + ' in ' + $('city').value.trim();
+      var myUrl = $('myurl').value.trim();
+      var cityVal = $('city').value.trim();
+
+      try {
+        localStorage.setItem('placesKey', key);
+        localStorage.setItem('myUrl', myUrl);
+      } catch (err) {}
+
+      var btn = $('go');
+      var out = $('out');
+
+      btn.disabled = true;
+      out.textContent = '';
+      $('leadCount').textContent = '0';
+      $('checkedCount').textContent = '0';
+      $('statusCount').textContent = 'Searching';
+      setMsg('<span class=\"loader\"></span>Searching for leads…');
+
+      try {
+        var places = await fetchAll(key, query);
+        var showSocial = $('social').checked;
+
+        var leads = places.map(function(p){
+          var w = p.websiteUri;
+          p._status = !w ? 'none' : (SOCIAL.test(w) ? 'social' : 'site');
+          return p;
+        }).filter(function(p){
+          return p._status === 'none' || (showSocial && p._status === 'social');
+        });
+
+        $('leadCount').textContent = leads.length;
+        $('checkedCount').textContent = places.length;
+
+        if (!places.length) {
+          $('statusCount').textContent = 'No results';
+          setMsg('No businesses found. Check the spelling of the type and city.', true);
+        } else {
+          $('statusCount').textContent = 'Ready';
+          setMsg('Checked ' + places.length + ' businesses. Found ' + leads.length + ' potential leads.', false, true);
+        }
+
+        leads.forEach(function(p){
+          var card = el('div', 'item');
+
+          card.appendChild(el('h3', '', (p.displayName && p.displayName.text) || 'Unnamed business'));
+          if (p.formattedAddress) card.appendChild(el('p', '', p.formattedAddress));
+
+          var tag = el('span', 'tag' + (p._status === 'social' ? ' social' : ''),
+            p._status === 'none' ? 'No website' : 'Social page only');
+
+          card.appendChild(tag);
+
+          if (p.rating) {
+            var rating = el('div', 'rating');
+            rating.appendChild(el('span', 'star', '★'));
+            rating.appendChild(el('span', '', p.rating));
+            rating.appendChild(document.createTextNode(' (' + (p.userRatingCount || 0) + ' reviews)'));
+            card.appendChild(rating);
+          }
+
+          var acts = el('div', 'acts');
+
+          if (p.nationalPhoneNumber) {
+            acts.appendChild(link('Call', 'tel:' + p.nationalPhoneNumber.replace(/[^\d+]/g, '')));
+          }
+          if (p.websiteUri) acts.appendChild(link('See their page', p.websiteUri));
+          if (p.googleMapsUri) acts.appendChild(link('Open in Maps', p.googleMapsUri));
+
+          var nm = (p.displayName && p.displayName.text) || '';
+          var q = function(site){
+            return 'https://www.google.com/search?q=' + encodeURIComponent('site:' + site + ' ' + nm + ' ' + cityVal);
+          };
+
+          acts.appendChild(link('Find on Facebook', q('facebook.com')));
+          acts.appendChild(link('Find on Instagram', q('instagram.com')));
+
+          var cp = el('button', 'cp', 'Copy message');
+          cp.type = 'button';
+          cp.addEventListener('click', function(){
+            copyText(pitch((p.displayName && p.displayName.text) || 'your business', myUrl), cp);
+          });
+          acts.appendChild(cp);
+
+          card.appendChild(acts);
+          out.appendChild(card);
+        });
+      } catch (err) {
+        $('statusCount').textContent = 'Error';
+        setMsg('Error: ' + err.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
+```
